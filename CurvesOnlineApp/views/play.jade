@@ -1,0 +1,51 @@
+extends layout
+
+block vars
+  - var title = 'Play | Room: ' + room
+
+block scripts
+  script(src='/javascripts/websocket.js')
+  script(src='/javascripts/play.js')
+  script(src='/javascripts/snake.js')
+  
+  script(type='text/javascript')
+    var theroom = room
+
+block content
+  div.contentDiv#gameArea
+    canvas#field(width='512', height='512')
+    p Click to place a dot
+  
+  div#gameSidebar
+    div.contentDiv.sidebarDiv#roomId
+      | Room: #{room}
+    
+    div.contentDiv.sidebarDiv#playerListContainer
+      | Online users:
+      ul#playerList
+        li example
+    
+    div.contentDiv.sidebarDiv#colorPicker
+      |Pick your color!
+      br
+      |Red
+      br
+      input.pickerSlider#colorRed(type='range', min='0', max='255' value='0')
+      br
+      |Green
+      br
+      input.pickerSlider#colorGreen(type='range', min='0', max='255' value='0')
+      br
+      |Blue
+      br
+      input.pickerSlider#colorBlue(type='range', min='0', max='255' value='0')
+      div#colorPreview
+      
+    div.contentDiv.sidebarDiv#sizePicker
+      |Pick your size!
+      br
+      input.pickerSlider#size(type='range', min='0', max='20' value='10')
+      div#sizePreview
+      
+    input#snakeButton(type='button', value='Snake')
+    input#snakeOffButton(type='button', value='SnakeOff')
