@@ -6,8 +6,8 @@ var init = function() {
 window.addEventListener('load', init, false);
 
 var open_close = function() {
-  var container = document.getElementById('container');
-  container.style.top = container.style.top == '0px' ? '-50px' : '0px';
+  var headerContainer = document.getElementById('headerContainer');
+  headerContainer.style.top = headerContainer.style.top == '0px' ? '-50px' : '0px';
 };
 
 var login = function() {

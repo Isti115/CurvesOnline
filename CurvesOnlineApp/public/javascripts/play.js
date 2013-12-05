@@ -1,6 +1,6 @@
 var canvas, context;
 
-var size = 10;
+var radius;
 var color;
 
 var play_init = function() {
@@ -13,22 +13,33 @@ var play_init = function() {
   
   colorChanged();
   
-  document.getElementById('size').addEventListener('change', sizeChanged, false);
+  document.getElementById('radius').addEventListener('change', radiusChanged, false);
   
-  sizeChanged();
+  radiusChanged();
   
   document.getElementById('snakeButton').addEventListener('click', snake_init, false);
   document.getElementById('snakeOffButton').addEventListener('click', function(){stop = true;}, false);
+  
   document.getElementById('saveButton').addEventListener('click', save, false);
   
-  // canvas.addEventListener('click', fieldClick, false);
+  document.getElementById('joinButton').addEventListener('click', join, false);
 };
 
 window.addEventListener('load', play_init, false);
 
+var join = function() {
+  var username = document.getElementById('usernameInput').value;
+  var room = document.getElementById('roomInput').value;
+  
+  socketSendString({type:'join', data:{username:username, room:room}});
+  
+  window.history.replaceState('', '', '/play/' + room);
+  document.getElementById('joinDialogContainer').style.display = 'none';
+};
+
 var getHexColor = function(dec) {
   return ('0' + parseInt(dec).toString(16)).slice(-2);
-}
+};
 
 var colorChanged = function() {
   color = '#';
@@ -38,14 +49,14 @@ var colorChanged = function() {
   color += getHexColor(document.getElementById('colorBlue').value);
   
   document.getElementById('colorPreview').style.backgroundColor = color;
-  document.getElementById('sizePreview').style.backgroundColor = color;
-}
+  document.getElementById('radiusPreview').style.backgroundColor = color;
+};
 
-var sizeChanged = function() {
-  size = document.getElementById('size').value;
-  document.getElementById('sizePreview').style.width = size + 'px';
-  document.getElementById('sizePreview').style.height = size + 'px';
-}
+var radiusChanged = function() {
+  radius = document.getElementById('radius').value;
+  document.getElementById('radiusPreview').style.width = radius + 'px';
+  document.getElementById('radiusPreview').style.height = radius + 'px';
+};
 
 var printIps = function(ipList) {
   var playerList = document.getElementById('playerList');
@@ -63,29 +74,28 @@ var printIps = function(ipList) {
     playerListItem.appendChild(playerListItemText);
     playerList.appendChild(playerListItem);
   }
-}
+};
 
-var drawRect = function(rectangle) {
-  context.fillStyle = rectangle.color;
-  //context.fillRect(rectangle.x, rectangle.y, rectangle.size, rectangle.size);
+var drawRect = function(Circle) {
+  context.fillStyle = Circle.color;
   context.beginPath();
-  context.arc(rectangle.x, rectangle.y, /*rectangle.size*/3, rad(0), rad(360));
+  context.arc(Circle.x, Circle.y, /*Circle.radius*/3, rad(0), rad(360));
   context.fill();
 };
 
 var fieldClick = function(e) {
-  var currentRectangle = new Rectangle(e.offsetX - (size/2) , e.offsetY - (size/2), color, size);
-  socketSendString({type:'rectdata', data: currentRectangle});
+  var currentCircle = new Circle(e.offsetX - (radius/2) , e.offsetY - (radius/2), color, radius);
+  socketSendString({type:'CircleData', data: currentCircle});
 };
 
 var save = function()
 {
-  window.open(canvas.toDataURL("image/png"));
-}
+  window.open(canvas.toDataURL('image/png'));
+};
 
-var Rectangle = function(x, y, color, size){
+var Circle = function(x, y, color, radius){
   this.x = x;
   this.y = y;
   this.color = color;
-  this.size = size;
-}
+  this.radius = radius;
+};

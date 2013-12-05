@@ -3,9 +3,8 @@ exports.home = function(req, res){
 };
 
 exports.play = function(req, res){
-  console.log(req.session.room);
-  req.session.room = req.params.room;
-  //res.cookie('room', req.params.room);
+  console.log(req.params.room);
+  res.cookie('room', req.params.room);
   res.render('play', {room: req.params.room});
 };
 

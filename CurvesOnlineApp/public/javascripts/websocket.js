@@ -1,4 +1,4 @@
-var webSocket = new WebSocket('ws://isti115.no-ip.org:3000/');
+var webSocket = new WebSocket('ws://localhost:3000/');
 
 webSocket.addEventListener('open', function (e) {
   console.log('Connection open.')
@@ -19,10 +19,10 @@ webSocket.addEventListener('error', function (e) {
 webSocket.addEventListener('message', function (message) {
   var parsedMessage = JSON.parse(message.data);
   
-  if(parsedMessage.type == 'rectdata')
+  if(parsedMessage.type == 'CircleData')
   {
-    var currentRectangle = parsedMessage.data;
-    drawRect(currentRectangle);
+    var currentCircle = parsedMessage.data;
+    drawRect(currentCircle);
   }
   
   else if(parsedMessage.type == 'iplist')

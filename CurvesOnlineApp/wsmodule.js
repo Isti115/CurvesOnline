@@ -1,6 +1,6 @@
 var WebSocketServer = require('ws').Server;
 
-var onlineUsers = [];
+var rooms = {};
 
 module.exports.init = function(server) {
   var webSocketServer = new WebSocketServer({server:server});
@@ -11,40 +11,53 @@ module.exports.init = function(server) {
       
       var parsedMessage = JSON.parse(message);
       
-      if(parsedMessage.type == 'login')
+      if(parsedMessage.type == 'join')
       {
-        if(onlineUsers.indexOf(parsedMessage.data.username) == -1)
-        {
-          onlineUsers.push(parsedMessage.data.username);
-        }
-        console.log(parsedMessage.data.username + " logged in.");
+        webSocketConnection.username = parsedMessage.data.username;
+        webSocketConnection.room = parsedMessage.data.room;
         
-        updateIpList(webSocketServer);
+        console.log(parsedMessage.data.username + ' joined room ' + parsedMessage.data.room);
+        
+        if(!(parsedMessage.data.room in rooms))
+        {
+          rooms[parsedMessage.data.room] = [];
+          console.log('new room : ' + parsedMessage.data.room)
+        }
+        rooms[parsedMessage.data.room].push(webSocketConnection);
       }
       
-      else
-      {
-        for(var i = 0; i < webSocketServer.clients.length; i++)
-        {
-          webSocketServer.clients[i].send(message);
-        }
-      }
+      roomLog();
+      
+      // for(var i = 0; i < webSocketServer.clients.length; i++)
+      // {
+      //   webSocketServer.clients[i].send(message);
+      // }
       
     });
     
-    updateIpList(webSocketServer);
+    // updateUserList(webSocketServer);
     
     console.log('client connected with ip: ' + webSocketConnection._socket.remoteAddress);
     
     webSocketConnection.addListener('close', function() {
-      updateIpList(webSocketServer);
+      console.log(webSocketConnection.username + ' left');
+      
+      if(webSocketConnection.username) {
+        var index = rooms[webSocketConnection.room].indexOf(webSocketConnection);
+        
+        rooms[webSocketConnection.room].splice(index, 1);
+        
+        if(rooms[webSocketConnection.room].length == 0) {
+          delete rooms[webSocketConnection.room];
+        }
+      }
     });
     
   });
   
 };
 
-var updateIpList = function(webSocketServer) {
+var updateUserList = function(webSocketServer) {
   var ips = [];
     
     for(var i = 0; i < webSocketServer.clients.length; i++)
@@ -61,4 +74,17 @@ var updateIpList = function(webSocketServer) {
     {
         webSocketServer.clients[i].send(JSON.stringify({type:'iplist', data: ips}));
     }
+};
+
+var roomLog = function() {
+  console.log('rooms:');
+  
+  for(var room in rooms)
+  {
+    console.log('--' + room);
+    for(var i = 0; i < rooms[room].length; i++)
+    {
+      console.log('----' + rooms[room][i].username);
+    }
+  }
 };

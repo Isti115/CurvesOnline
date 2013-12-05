@@ -10,7 +10,7 @@ block content
   hr
   |for(var i = 0; i < 512; i++)
   |{
-  |  webSocket.send(JSON.stringify({"type":"rectdata","data":{"x":i,"y":i,"color":"#000000"}}));
+  |  webSocket.send(JSON.stringify({"type":"CircleData","data":{"x":i,"y":i,"color":"#000000"}}));
   |}
   hr
-  |for(var i = 0; i < 52; i++) { webSocket.send(JSON.stringify({"type":"rectdata","data":{"x":i * 10,"y":i * 10,"color":"#000000"}})); }
+  |for(var i = 0; i < 52; i++) { webSocket.send(JSON.stringify({"type":"CircleData","data":{"x":i * 10,"y":i * 10,"color":"#000000"}})); }

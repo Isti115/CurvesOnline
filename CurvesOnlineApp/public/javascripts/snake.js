@@ -3,17 +3,14 @@
 var width, height;
 
 var keyDown = new Array();
-var wasKeyDown = new Array();
 
 var x, y;
 var step;
 var direction, curveRatio;
 
 var stop = false;
-var dynamicSize = false;
 
-function snake_init()
-{
+var snake_init = function() {
   window.addEventListener("keydown", keydown, false);
   window.addEventListener("keyup", keyup, false);
   
@@ -23,73 +20,50 @@ function snake_init()
   x = Math.random() * width;
   y = Math.random() * height;
   
-  step = 5;
+  step = 10;
   direction = 0;
   curveRatio = 3;
   
   main();
-}
+};
 
-function keydown(e)
-{
+var keydown = function(e) {
   keyDown[e.keyCode] = true;
-}
+};
 
-function keyup(e)
-{
+var keyup = function(e) {
   keyDown[e.keyCode] = false;
-}
+};
 
-function limit(value, range)
-{
+var limit = function(value, range) {
   return (value + range) % range;
-}
+};
 
-function rad(deg)
-{
+var rad = function(deg) {
   return (Math.PI / 180) * deg;
-}
+};
 
-function main()
-{
+var main = function() {
   control();
   update();
   draw();
   
-  if(!stop)
-  {
+  if(!stop) {
     window.requestAnimationFrame(main);
   }
-}
+};
 
-function control()
-{
-  if(keyDown[37])
-  {
-    wasKeyDown[37] = true;
-    
+var control = function() {
+  if(keyDown[37]) {
     direction += curveRatio;
   }
   
-  else if(wasKeyDown[37] && !keyDown[37])
-  {
-    wasKeyDown[37] = false;
-  }
-  
-  if(keyDown[39])
-  {
-    wasKeyDown[39] = true;
-    
+  if(keyDown[39]) {
     direction -= curveRatio;
   }
   
-  else if(wasKeyDown[39] && !keyDown[39])
-  {
-    wasKeyDown[39] = false;
-  }
-  
   console.log(direction);
-}
+};
 
 var getHexColor = function(dec) {
   return ('0' + parseInt(dec).toString(16)).slice(-2);
@@ -100,41 +74,12 @@ var getPixel = function(x, y) {
   return '#' + getHexColor(pixel.data[0]) + getHexColor(pixel.data[1]) + getHexColor(pixel.data[2]);
 };
 
-function update()
-{
+var update = function() {
   x = limit(x + Math.sin(rad(direction)), width);
   y = limit(y + Math.cos(rad(direction)), height);
-  
-  if(getPixel(x + (Math.sin(rad(direction)) * 5), y + (Math.cos(rad(direction)) * 5)) != "#000000")
-  {
-    console.log(getPixel(x + (Math.sin(rad(direction)) * 5), y + (Math.cos(rad(direction)) * 5)));
-    alert("you lost");
-    stop = true;
-  }
-  
-  // if(direction == 0)
-  // {
-  //   y = limit(y - step, height);
-  // }
-  
-  // else if(direction == 1)
-  // {
-  //   x = limit(x + step, width);
-  // }
-  
-  // else if(direction == 2)
-  // {
-  //   y = limit(y + step, height);
-  // }
-  
-  // else if(direction == 3)
-  // {
-  //   x = limit(x - step, width);
-  // }
-}
+};
 
-function draw()
-{
-  var currentRectangle = new Rectangle(x, y, color, size);
-  socketSendString({type:'rectdata', data: currentRectangle});
-}
+var draw = function() {
+  var currentCircle = new Circle(x, y, color, radius);
+  socketSendString({type:'CircleData', data: currentCircle});
+};

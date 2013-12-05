@@ -7,11 +7,20 @@ block scripts
   script(src='/javascripts/websocket.js')
   script(src='/javascripts/play.js')
   script(src='/javascripts/snake.js')
-  
-  script(type='text/javascript')
-    var theroom = room
 
 block content
+  div#joinDialogContainer
+    div#joinDialogTable
+      div#joinDialogCell
+        div#joinDialog.contentDiv
+          |Username: <br/>
+          input#usernameInput(type='text', value='Guest')
+          |<br/>
+          |Room: <br/>
+          input#roomInput(type='text', value=room)
+          |<br/>
+          input#joinButton(type='button', value='Join')
+  
   div.contentDiv#gameArea
     canvas#field(width='512', height='512')
     p Click to place a dot
@@ -41,11 +50,11 @@ block content
       input.pickerSlider#colorBlue(type='range', min='0', max='255' value='0')
       div#colorPreview
       
-    div.contentDiv.sidebarDiv#sizePicker
-      |Pick your size!
+    div.contentDiv.sidebarDiv#radiusPicker
+      |Pick your radius!
       br
-      input.pickerSlider#size(type='range', min='0', max='20' value='10')
-      div#sizePreview
+      input.pickerSlider#radius(type='range', min='0', max='20' value='10')
+      div#radiusPreview
       
     input#snakeButton(type='button', value='Snake')
     input#snakeOffButton(type='button', value='SnakeOff')
