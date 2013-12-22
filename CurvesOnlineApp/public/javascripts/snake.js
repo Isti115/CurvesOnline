@@ -1,29 +1,30 @@
-"use strict";
+'use strict';
 
-var width, height;
-
-var keyDown = new Array();
+var keyDown = [];
 
 var x, y;
-var step;
-var direction, curveRatio;
+var prevX, prevY;
 
-var stop = false;
+var step;
+var direction, turningSpeed;
+
+var stop;
 
 var snake_init = function() {
-  window.addEventListener("keydown", keydown, false);
-  window.addEventListener("keyup", keyup, false);
-  
-  width = canvas.width;
-  height = canvas.height;
+  window.addEventListener('keydown', keydown, false);
+  window.addEventListener('keyup', keyup, false);
   
   x = Math.random() * width;
   y = Math.random() * height;
   
-  step = 10;
-  direction = 0;
-  curveRatio = 3;
+  prevX = x;
+  prevY = y;
   
+  step = radius;
+  direction = 0;
+  turningSpeed = 2;
+  
+  stop = false;
   main();
 };
 
@@ -51,18 +52,21 @@ var main = function() {
   if(!stop) {
     window.requestAnimationFrame(main);
   }
+  
+  else
+  {
+    document.getElementById('messageOutput').innerHTML += 'game over...';
+  }
 };
 
 var control = function() {
   if(keyDown[37]) {
-    direction += curveRatio;
+    direction += turningSpeed;
   }
   
   if(keyDown[39]) {
-    direction -= curveRatio;
+    direction -= turningSpeed;
   }
-  
-  console.log(direction);
 };
 
 var getHexColor = function(dec) {
@@ -75,11 +79,20 @@ var getPixel = function(x, y) {
 };
 
 var update = function() {
-  x = limit(x + Math.sin(rad(direction)), width);
-  y = limit(y + Math.cos(rad(direction)), height);
+  prevX = x;
+  prevY = y;
+  
+  x = limit(x + Math.sin(rad(direction)) * step, width);
+  y = limit(y + Math.cos(rad(direction)) * step, height);
+  
+  if (grid[Math.floor(x / step)][Math.floor(y / step)] == 1) {
+    stop = true;
+  }
+  
+  // grid[Math.floor(prevX / step)][Math.floor(prevY / step)] = 1;
 };
 
 var draw = function() {
-  var currentCircle = new Circle(x, y, color, radius);
+  var currentCircle = new Circle(prevX, prevY, color, radius);
   socketSendString({type:'CircleData', data: currentCircle});
 };

@@ -1,21 +1,38 @@
+'use strict';
+
 var canvas, context;
+
+var width, height;
 
 var radius;
 var color;
 
+var grid;
+
 var play_init = function() {
+  radius = 3;
+  
   canvas = document.getElementById('field');
   context = canvas.getContext('2d');
+  
+  width = canvas.width;
+  height = canvas.height;
+  
+  grid = [];
+  
+  for(var i = 0; i < width / radius; i++) {
+    grid[i] = [];
+    
+    for(var j = 0; j < height / radius; j++) {
+      grid[i][j] = 0;
+    }
+  }
   
   document.getElementById('colorRed').addEventListener('change', colorChanged, false);
   document.getElementById('colorGreen').addEventListener('change', colorChanged, false);
   document.getElementById('colorBlue').addEventListener('change', colorChanged, false);
   
   colorChanged();
-  
-  document.getElementById('radius').addEventListener('change', radiusChanged, false);
-  
-  radiusChanged();
   
   document.getElementById('snakeButton').addEventListener('click', snake_init, false);
   document.getElementById('snakeOffButton').addEventListener('click', function(){stop = true;}, false);
@@ -31,7 +48,7 @@ var join = function() {
   var username = document.getElementById('usernameInput').value;
   var room = document.getElementById('roomInput').value;
   
-  socketSendString({type:'join', data:{username:username, room:room}});
+  socketSendString({type:'Join', data:{username:username, room:room}});
   
   window.history.replaceState('', '', '/play/' + room);
   document.getElementById('joinDialogContainer').style.display = 'none';
@@ -49,43 +66,31 @@ var colorChanged = function() {
   color += getHexColor(document.getElementById('colorBlue').value);
   
   document.getElementById('colorPreview').style.backgroundColor = color;
-  document.getElementById('radiusPreview').style.backgroundColor = color;
 };
 
-var radiusChanged = function() {
-  radius = document.getElementById('radius').value;
-  document.getElementById('radiusPreview').style.width = radius + 'px';
-  document.getElementById('radiusPreview').style.height = radius + 'px';
-};
-
-var printIps = function(ipList) {
-  var playerList = document.getElementById('playerList');
+var printPlayers = function(playerList) {
+  var playerListUl = document.getElementById('playerList');
   
-  while(playerList.hasChildNodes())
+  while(playerListUl.hasChildNodes())
   {
-    playerList.removeChild(playerList.firstChild);
+    playerListUl.removeChild(playerListUl.firstChild);
   }
   
-  for(var i = 0; i < ipList.length; i++)
+  for(var i = 0; i < playerList.length; i++)
   {
     var playerListItem = document.createElement('li');
-    var playerListItemText = document.createTextNode(ipList[i]);
+    var playerListItemText = document.createTextNode(playerList[i]);
     
     playerListItem.appendChild(playerListItemText);
-    playerList.appendChild(playerListItem);
+    playerListUl.appendChild(playerListItem);
   }
 };
 
-var drawRect = function(Circle) {
-  context.fillStyle = Circle.color;
+var drawCircle = function(circle) {
+  context.fillStyle = circle.color;
   context.beginPath();
-  context.arc(Circle.x, Circle.y, /*Circle.radius*/3, rad(0), rad(360));
+  context.arc(circle.x, circle.y, circle.radius, rad(0), rad(360));
   context.fill();
-};
-
-var fieldClick = function(e) {
-  var currentCircle = new Circle(e.offsetX - (radius/2) , e.offsetY - (radius/2), color, radius);
-  socketSendString({type:'CircleData', data: currentCircle});
 };
 
 var save = function()

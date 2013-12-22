@@ -1,4 +1,4 @@
-var webSocket = new WebSocket('ws://localhost:3000/');
+var webSocket = new WebSocket('ws://isti115.no-ip.org:3000/');
 
 webSocket.addEventListener('open', function (e) {
   console.log('Connection open.')
@@ -22,12 +22,20 @@ webSocket.addEventListener('message', function (message) {
   if(parsedMessage.type == 'CircleData')
   {
     var currentCircle = parsedMessage.data;
-    drawRect(currentCircle);
+    drawCircle(currentCircle);
+    grid[Math.floor(currentCircle.x / step)][Math.floor(currentCircle.y / step)] = 1;
+    
+    if(typeof grid[Math.floor(currentCircle.x / step)] == 'undefined')
+    {
+      console.log(currentCircle.x);
+    }
+    
+    //console.log(grid, Math.floor(currentCircle.x / step), Math.floor(currentCircle.y / step));
   }
   
-  else if(parsedMessage.type == 'iplist')
+  else if(parsedMessage.type == 'PlayerList')
   {
-    var ipList = parsedMessage.data;
-    printIps(ipList)
+    var playerList = parsedMessage.data;
+    printPlayers(playerList);
   }
 }, false);

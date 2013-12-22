@@ -11,7 +11,7 @@ module.exports.init = function(server) {
       
       var parsedMessage = JSON.parse(message);
       
-      if(parsedMessage.type == 'join')
+      if(parsedMessage.type == 'Join')
       {
         webSocketConnection.username = parsedMessage.data.username;
         webSocketConnection.room = parsedMessage.data.room;
@@ -24,18 +24,21 @@ module.exports.init = function(server) {
           console.log('new room : ' + parsedMessage.data.room)
         }
         rooms[parsedMessage.data.room].push(webSocketConnection);
+        
+        updateUserList(parsedMessage.data.room);
       }
       
-      roomLog();
-      
-      // for(var i = 0; i < webSocketServer.clients.length; i++)
-      // {
-      //   webSocketServer.clients[i].send(message);
-      // }
+      //roomLog();
+      else if (parsedMessage.type == 'CircleData')
+      {
+        for(var i = 0; i < rooms[webSocketConnection.room].length; i++)
+        {
+          rooms[webSocketConnection.room][i].send(message);
+        }
+      }
       
     });
     
-    // updateUserList(webSocketServer);
     
     console.log('client connected with ip: ' + webSocketConnection._socket.remoteAddress);
     
@@ -47,6 +50,8 @@ module.exports.init = function(server) {
         
         rooms[webSocketConnection.room].splice(index, 1);
         
+        updateUserList(webSocketConnection.room);
+        
         if(rooms[webSocketConnection.room].length == 0) {
           delete rooms[webSocketConnection.room];
         }
@@ -57,22 +62,17 @@ module.exports.init = function(server) {
   
 };
 
-var updateUserList = function(webSocketServer) {
-  var ips = [];
+var updateUserList = function(room) {
+  var players = [];
     
-    for(var i = 0; i < webSocketServer.clients.length; i++)
+    for(var i = 0; i < rooms[room].length; i++)
     {
-        ips.push(webSocketServer.clients[i]._socket.remoteAddress);
+        players.push(rooms[room][i].username);
     }
     
-    for(var i = 0; i < onlineUsers.length; i++)
+    for(var i = 0; i < rooms[room].length; i++)
     {
-        ips.push(onlineUsers[i]);
-    }
-    
-    for(var i = 0; i < webSocketServer.clients.length; i++)
-    {
-        webSocketServer.clients[i].send(JSON.stringify({type:'iplist', data: ips}));
+        rooms[room][i].send(JSON.stringify({type:'PlayerList', data: players}));
     }
 };
 
